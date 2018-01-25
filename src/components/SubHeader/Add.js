@@ -19,28 +19,23 @@ type Props = {
     showCreate: boolean,
     onUpload: Function,
     onCreate: Function,
+    onCreateScratch: Function,
     isLoaded: boolean,
     rootElement: HTMLElement
 };
 
-const Add = ({ onUpload, onCreate, isLoaded, showUpload = true, showCreate = true, rootElement }: Props) => (
-    <DropdownMenu isRightAligned constrainToScrollParent bodyElement={rootElement}>
-        <Button type='button' className='be-btn-add' isDisabled={!isLoaded}>
-            <IconAddThin />
-        </Button>
-        <Menu>
-            {showUpload && (
-                <MenuItem onClick={onUpload}>
-                    <FormattedMessage {...messages.upload} />
-                </MenuItem>
-            )}
-            {showCreate && (
-                <MenuItem onClick={onCreate}>
-                    <FormattedMessage {...messages.newFolder} />
-                </MenuItem>
-            )}
-        </Menu>
-    </DropdownMenu>
+const Add = ({
+    onUpload,
+    onCreate,
+    onCreateScratch,
+    isLoaded,
+    showUpload = true,
+    showCreate = true,
+    rootElement
+}: Props) => (
+    <Button onClick={onCreateScratch} type='button' className='be-btn-add' isDisabled={!isLoaded}>
+        <IconAddThin />
+    </Button>
 );
 
 export default Add;

@@ -45,6 +45,7 @@ const PreviewDialog = ({
     hasPreviewSidebar,
     onCancel,
     onPreview,
+    onCloseScratch,
     apiHost,
     appHost,
     staticHost,
@@ -85,6 +86,7 @@ const PreviewDialog = ({
                 collection={files}
                 onLoad={onLoad}
                 onClose={onCancel}
+                onCloseScratch={onCloseScratch}
                 hasSidebar={hasPreviewSidebar}
                 sharedLink={sharedLink}
                 sharedLinkPassword={sharedLinkPassword}

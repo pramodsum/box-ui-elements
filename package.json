@@ -37,6 +37,7 @@
   },
   "scripts": {
     "build": "yarn run pre-build && LANGUAGE=en-US BABEL_ENV=dev NODE_ENV=dev ./node_modules/.bin/webpack --progress --colors --config build/webpack.config.js",
+    "watch": "yarn run pre-build && LANGUAGE=en-US BABEL_ENV=dev NODE_ENV=dev ./node_modules/.bin/webpack --watch --progress --colors --config build/webpack.config.js",
     "build-ci": "LANGUAGE=en-US yarn run build-prod",
     "build-prod": "BABEL_ENV=production NODE_ENV=production node --max_old_space_size=4096 ./node_modules/webpack/bin/webpack.js --config build/webpack.config.js",
     "build-npm": "yarn run npm && yarn run build-lib",
@@ -48,7 +49,7 @@
     "copy-lib": "./node_modules/.bin/cpx './src/{**/!(__tests__)/*,*}' lib",
     "commitmsg": "conventional-changelog-lint -e",
     "debug": "NODE_ENV=test yarn run jest --watch",
-    "deploy": "yarn run pre-build && LANGUAGE=en-US BABEL_ENV=dev NODE_ENV=dev ./node_modules/.bin/webpack-dev-server --config build/webpack.config.js",
+    "deploy": "yarn run pre-build && LANGUAGE=en-US BABEL_ENV=dev NODE_ENV=dev ./node_modules/.bin/webpack-dev-server --port 8000 --config build/webpack.config.js",
     "github-release": "./node_modules/.bin/conventional-github-releaser",
     "lint": "NODE_ENV=dev ./node_modules/.bin/eslint src && ./node_modules/.bin/stylelint 'src/**/*.scss'",
     "npm": "OUTPUT=dist LANGUAGE=en-US yarn run build-prod",

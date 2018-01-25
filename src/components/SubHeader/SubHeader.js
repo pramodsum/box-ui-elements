@@ -18,6 +18,7 @@ type Props = {
     currentCollection: Collection,
     onUpload: Function,
     onCreate: Function,
+    onCreateScratch: Function,
     canUpload: boolean,
     canCreateNewFolder: boolean,
     view: View,
@@ -34,6 +35,7 @@ const SubHeader = ({
     currentCollection,
     onUpload,
     onCreate,
+    onCreateScratch,
     canUpload,
     canCreateNewFolder,
     view,
@@ -57,6 +59,7 @@ const SubHeader = ({
             canCreateNewFolder={canCreateNewFolder}
             onUpload={onUpload}
             onCreate={onCreate}
+            onCreateScratch={onCreateScratch}
             onSortChange={onSortChange}
         />
     </div>

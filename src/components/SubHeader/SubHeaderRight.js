@@ -7,6 +7,8 @@
 import React from 'react';
 import Sort from './Sort';
 import Add from './Add';
+import Button from 'box-react-ui/lib/components/button/Button';
+import IconFileImage from 'box-react-ui/lib/icons/file/IconFileImage';
 import { VIEW_SEARCH, VIEW_FOLDER, VIEW_RECENTS } from '../../constants';
 import type { View, Collection } from '../../flowTypes';
 import './SubHeaderRight.scss';
@@ -16,6 +18,7 @@ type Props = {
     currentCollection: Collection,
     onUpload: Function,
     onCreate: Function,
+    onCreateScratch: Function,
     canUpload: boolean,
     canCreateNewFolder: boolean,
     view: View,
@@ -27,6 +30,7 @@ const SubHeaderRight = ({
     rootElement,
     onUpload,
     onCreate,
+    onCreateScratch,
     canUpload,
     canCreateNewFolder,
     currentCollection,
@@ -61,6 +65,7 @@ const SubHeaderRight = ({
                     showCreate={canCreateNewFolder}
                     onUpload={onUpload}
                     onCreate={onCreate}
+                    onCreateScratch={onCreateScratch}
                     isDisabled={!isFolder}
                     isLoaded={isLoaded}
                 />

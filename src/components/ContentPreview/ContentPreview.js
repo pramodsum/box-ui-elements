@@ -44,6 +44,7 @@ type Props = {
     onLoad: Function,
     onNavigate: Function,
     onClose?: Function,
+    onCloseScratch: Function,
     skipServerUpdate?: boolean,
     language: string,
     messages?: StringMap,
@@ -77,6 +78,7 @@ class ContentPreview extends PureComponent<Props, State> {
         hasSidebar: false,
         hasHeader: false,
         onLoad: noop,
+        onCloseScratch: noop,
         onNavigate: noop
     };
 
@@ -211,7 +213,7 @@ class ContentPreview extends PureComponent<Props, State> {
      */
     loadStylesheet(): void {
         const { head } = document;
-        const url: string = this.getBasePath('preview.css');
+        const url: string = 'https://app.spramod.inside-box.net/content-experience/dev/en-US/preview.css';
 
         if (!head || head.querySelector(`link[rel="stylesheet"][href="${url}"]`)) {
             return;
@@ -231,7 +233,7 @@ class ContentPreview extends PureComponent<Props, State> {
      */
     loadScript(): void {
         const { head } = document;
-        const url: string = this.getBasePath('preview.js');
+        const url: string = 'https://app.spramod.inside-box.net/content-experience/dev/en-US/preview.js';
 
         if (!head || this.isPreviewLibraryLoaded()) {
             return;
@@ -260,9 +262,9 @@ class ContentPreview extends PureComponent<Props, State> {
         }
 
         const { Preview } = global.Box;
-        const { fileId, token, onLoad, onNavigate, ...rest }: Props = this.props;
+        const { fileId, token, onLoad, onCloseScratch, onNavigate, ...rest }: Props = this.props;
         const { file }: State = this.state;
-        const fileOrFileId = file ? Object.assign({}, file) : fileId;
+        const fileOrFileId = file ? file.id : fileId;
 
         if ((!file && !fileId) || !token) {
             throw new Error('Missing file or fileId and/or token for Preview!');
@@ -274,6 +276,17 @@ class ContentPreview extends PureComponent<Props, State> {
             onNavigate(id);
         });
         this.preview.addListener('load', onLoad);
+        this.preview.addListener('load', (data) => {
+            if (!data.viewer) {
+                return;
+            }
+
+            data.viewer.addListener('save_scratch', (blob) => onCloseScratch(blob));
+        });
+        this.preview.addListener('save_scratch', () => {
+            console.log('asdfasdfasdf');
+            onCloseScratch(blob).bind(this);
+        });
         this.preview.show(fileOrFileId, token, {
             container: `#${this.id} .bcpr-content`,
             header: 'none',

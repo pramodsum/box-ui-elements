@@ -49,7 +49,10 @@ import {
     ERROR_CODE_ITEM_NAME_INVALID,
     ERROR_CODE_ITEM_NAME_TOO_LONG,
     ERROR_CODE_ITEM_NAME_IN_USE,
-    TYPED_ID_FOLDER_PREFIX
+    TYPED_ID_FOLDER_PREFIX,
+    STATUS_PENDING,
+    STATUS_IN_PROGRESS,
+    STATUS_COMPLETE
 } from '../../constants';
 import type {
     BoxItem,
@@ -96,6 +99,7 @@ type Props = {
     onPreview: Function,
     onRename: Function,
     onCreate: Function,
+    onCreateScratch: Function,
     onSelect: Function,
     onUpload: Function,
     onNavigate: Function,
@@ -934,6 +938,220 @@ class ContentExplorer extends Component<Props, State> {
     };
 
     /**
+     * Creates a new scratch
+     *
+     * @private
+     * @return {void}
+     */
+    createScratch = (): void => {
+        // Create blank image file
+        const c = document.createElement('canvas');
+        const ctx = c.getContext('2d');
+        ctx.fillStyle = 'transparent';
+        ctx.fillRect(0, 0, 100, 100);
+
+        c.toBlob((blob) => this.createScratchCallback(this.uploadFile, blob, true));
+    };
+
+    saveScratch = (blob: any): void => {
+        this.createScratchCallback(this.uploadFile, blob, false);
+    };
+
+    /**
+     * Generates file id based on file properties
+     *
+     * @param {UploadFileWithAPIOptions | File} file
+     */
+    getFileId(file) {
+        if (!file.options) {
+            return file.name;
+        }
+
+        if (!file.options.folderId || !file.options.uploadInitTimestamp) {
+            return file.file.name;
+        }
+
+        return `${file.file.name}_${file.options.folderId}_${file.options.uploadInitTimestamp}`;
+    }
+
+    /**
+     * Returns a new API instance for the given file.
+     *
+     * @private
+     * @param {File} file - File to get a new API instance for
+     * @param {UploadItemAPIOptions} [uploadAPIOptions]
+     * @return {UploadAPI} - Instance of Upload API
+     */
+    getUploadAPI(file, uploadAPIOptions?: UploadItemAPIOptions) {
+        const { chunked } = this.props;
+        const { size } = file;
+        const factory = this.createAPIFactory(uploadAPIOptions);
+
+        if (chunked && size > CHUNKED_UPLOAD_MIN_SIZE_BYTES) {
+            return factory.getChunkedUploadAPI();
+        }
+
+        return factory.getPlainUploadAPI();
+    }
+
+    /**
+     * Create and return new instance of API creator
+     *
+     * @param {UploadItemAPIOptions} [uploadAPIOptions]
+     * @return {API}
+     */
+    createAPIFactory(uploadAPIOptions?: UploadItemAPIOptions): API {
+        const {
+            rootFolderId,
+            token,
+            sharedLink,
+            sharedLinkPassword,
+            apiHost,
+            uploadHost,
+            clientName,
+            responseFilter
+        } = this.props;
+
+        const itemFolderId =
+            uploadAPIOptions && uploadAPIOptions.folderId
+                ? `${TYPED_ID_FOLDER_PREFIX}${uploadAPIOptions.folderId}`
+                : `${TYPED_ID_FOLDER_PREFIX}${rootFolderId}`;
+        const itemFileId =
+            uploadAPIOptions && uploadAPIOptions.fileId ? `${TYPED_ID_FILE_PREFIX}${uploadAPIOptions.fileId}` : null;
+
+        const options = {
+            token,
+            sharedLink,
+            sharedLinkPassword,
+            apiHost,
+            uploadHost,
+            clientName,
+            responseFilter,
+            id: itemFileId || itemFolderId,
+            ...uploadAPIOptions
+        };
+        return new API(options);
+    }
+
+    /**
+     * New folder callback
+     *
+     * @private
+     * @param {string} name - folder name
+     * @return {void}
+     */
+    createScratchCallback = (itemUpdateCallback, blob, shouldPreviewUpload) => {
+        const { fileLimit, useUploadsManager } = this.props;
+        const { view, items } = this.state;
+
+        clearTimeout(this.resetItemsTimeout);
+        this.createFile(blob, shouldPreviewUpload);
+    };
+
+    createFile(blob, shouldPreviewUpload) {
+        const file = new File([blob], 'scratch.png');
+
+        // Convert file from the file API to upload item
+        const uploadFile = file;
+        const { name, size } = uploadFile;
+
+        // Extract extension or use empty string if file has no extension
+        let extension = name.substr(name.lastIndexOf('.') + 1);
+        if (extension.length === name.length) {
+            extension = '';
+        }
+
+        const api = this.getUploadAPI(uploadFile);
+        const uploadItem: UploadItem = {
+            api,
+            extension,
+            file: uploadFile,
+            name,
+            progress: 0,
+            size,
+            status: STATUS_PENDING
+        };
+
+        this.setState({ errorCode: '' });
+        this.uploadFile(uploadItem, shouldPreviewUpload);
+    }
+
+    /**
+     * Helper to upload a single file.
+     *
+     * @param {UploadItem} item - Upload item object
+     * @return {void}
+     */
+    uploadFile(item: UploadItem, shouldPreviewUpload: Boolean) {
+        const { rootFolderId } = this.props;
+        const { api, file, options } = item;
+
+        const uploadOptions: Object = {
+            file,
+            folderId: options && options.folderId ? options.folderId : rootFolderId,
+            errorCallback: (error) => this.handleUploadError(item, error),
+            successCallback: (entries) => this.handleUploadSuccess(item, entries, shouldPreviewUpload),
+            overwrite: true,
+            fileId: options && options.fileId ? options.fileId : null
+        };
+
+        api.upload(uploadOptions);
+
+        item.status = STATUS_IN_PROGRESS;
+    }
+
+    /**
+     * Handles an upload error.
+     *
+     * @private
+     * @param {UploadItem} item - Upload item corresponding to error
+     * @param {Error} error - Upload error
+     * @return {void}
+     */
+    handleUploadError = (item: UploadItem, error: Error) => {
+        const { onError } = this.props;
+        const { file } = item;
+
+        item.status = STATUS_ERROR;
+        item.error = error;
+
+        // Broadcast that there was an error uploading a file
+        const errorData = useUploadsManager
+            ? {
+                item,
+                error
+            }
+            : {
+                file,
+                error
+            };
+
+        onError(errorData);
+    };
+
+    /**
+     * Handles a successful upload.
+     *
+     * @private
+     * @param {UploadItem} item - Upload item corresponding to success event
+     * @param {BoxItem[]} entries - Successfully uploaded Box File objects
+     * @return {void}
+     */
+    handleUploadSuccess = (item: UploadItem, entries?: BoxItem[], shouldPreviewUpload) => {
+        item.progress = 100;
+        item.status = STATUS_COMPLETE;
+
+        const [boxItem] = entries;
+        boxItem.permissions = {
+            can_preview: true
+        };
+
+        if (shouldPreviewUpload) {
+            this.preview(boxItem);
+        }
+    };
+
+    /**
      * Creates a new folder
      *
      * @private
@@ -1209,7 +1427,7 @@ class ContentExplorer extends Component<Props, State> {
                             view={view}
                             isSmall={isSmall}
                             searchQuery={searchQuery}
-                            logoUrl={logoUrl}
+                            logoUrl={'http://1000logos.net/wp-content/uploads/2016/10/ACME-logo.png'}
                             onSearch={this.search}
                         />
                         <SubHeader
@@ -1223,6 +1441,7 @@ class ContentExplorer extends Component<Props, State> {
                             canCreateNewFolder={allowCreate}
                             onUpload={this.upload}
                             onCreate={this.createFolder}
+                            onCreateScratch={this.createScratch}
                             onItemClick={this.fetchFolder}
                             onSortChange={this.sort}
                         />
@@ -1323,6 +1542,7 @@ class ContentExplorer extends Component<Props, State> {
                             parentElement={this.rootElement}
                             appElement={this.appElement}
                             onPreview={onPreview}
+                            onCloseScratch={this.saveScratch}
                             hasPreviewSidebar={hasPreviewSidebar}
                             cache={this.api.getCache()}
                             apiHost={apiHost}

@@ -19,9 +19,8 @@
             .explorer1,
             .explorer2 {
                 width: 100%;
-                height: 600px;
+                height: 100%;
                 overflow: auto;
-                margin-bottom: 100px;
             }
 
             .container {
@@ -39,33 +38,13 @@
         <link rel="stylesheet" type="text/css" href="../dev/en-US/explorer.css" />
     </head>
     <body>
-        <div class="inputs">
-            <div>
-                <label>
-                    <div>Folder Id</div>
-                    <input class="folder" type="text" placeholder="Enter root folder id" value="0" />
-                </label>
-                <label>
-                    <div>Auth Token</div>
-                    <input class="token" type="text" placeholder="Enter auth token" />
-                </label>
-            </div>
-            <button type="button" onclick="load()">Submit</button>
-        </div>
-        <div class="container">
-            <h1>Content Explorer</h1>
-            <div class="explorer1"></div>
-            <h1>Content Explorer (no folder create)</h1>
-            <div class="explorer2"></div>
-            <h1>Content Explorer (no folder upload)</h1>
-            <div class="explorer3"></div>
-        </div>
+        <div class="explorer1"></div>
         <script src="../dev/en-US/explorer.js"></script>
         <script>
             function load() {
                 const { ContentExplorer } = Box;
-                const token = document.querySelector('.token').value || localStorage.getItem('token');
-                const folderId = document.querySelector('.folder').value || localStorage.getItem('folder');
+                const token = 'x0rZBqrAWv86aNLjmGr3Z9MG3XzoyHFW';
+                const folderId = '24105493431';
 
                 localStorage.setItem('token', token);
                 localStorage.setItem('folder', folderId);
@@ -116,24 +95,6 @@
                 explorer1.show(folderId, token, {
                     container: '.explorer1',
                     autoFocus: true
-                });
-
-
-                const explorer2 = new ContentExplorer();
-                document.querySelector('.explorer2').innerHTML = '';
-                explorer2.show(folderId, token, {
-                    container: '.explorer2',
-                    canCreateNewFolder: false,
-                    logoUrl: 'https://d30y9cdsu7xlg0.cloudfront.net/png/12458-200.png'
-                });
-
-
-                const explorer3 = new ContentExplorer();
-                document.querySelector('.explorer3').innerHTML = '';
-                explorer2.show(folderId, token, {
-                    container: '.explorer3',
-                    canUpload: false,
-                    logoUrl: 'box'
                 });
             }
             load();
