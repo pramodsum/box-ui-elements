@@ -70,19 +70,19 @@
                 localStorage.setItem('file', fileId);
                 document.querySelector('.file').value = fileId;
 
-                const sidebar1 = new ContentSidebar();
-                sidebar1.show(fileId, token, {
-                    container: '.sidebar1',
-                    hasProperties: true
-                });
+                // const sidebar1 = new ContentSidebar();
+                // sidebar1.show(fileId, token, {
+                //     container: '.sidebar1',
+                //     hasProperties: true
+                // });
 
-                const sidebar2 = new ContentSidebar();
-                sidebar2.show(fileId, token, {
-                    container: '.sidebar2',
-                    hasProperties: true,
-                    hasSkills: true,
-                    hasTitle: true
-                });
+                // const sidebar2 = new ContentSidebar();
+                // sidebar2.show(fileId, token, {
+                //     container: '.sidebar2',
+                //     hasProperties: true,
+                //     hasSkills: true,
+                //     hasTitle: true
+                // });
 
                 const sidebar3 = new ContentSidebar();
                 sidebar3.addListener('interaction', function(data) {
@@ -117,8 +117,7 @@
                 sidebar3.show(fileId, token, {
                     container: '.sidebar3',
                     hasProperties: true,
-                    hasActivityFeed: true,
-                    hasSkills: true
+                    hasActivityFeed: true
                 });
             }
             load();

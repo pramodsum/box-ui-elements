@@ -1,0 +1,11 @@
+@import '~box-react-ui/lib/styles/box-ui.theme.scss';
+
+.be {
+    .draft-js-editor label div  {
+        padding: 0;
+
+        [contentEditable=true] {
+            padding: 10px;
+        }
+    }
+}

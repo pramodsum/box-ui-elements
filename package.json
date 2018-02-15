@@ -100,7 +100,17 @@
     "yarn": ">=1.0.0"
   },
   "dependencies": {
+    "ajv": "^6.1.1",
+    "draft-js": "^0.10.5",
+    "form-serialize": "^0.7.2",
+    "immutable": "^3.8.2",
+    "mousetrap": "^1.6.1",
+    "pikaday": "^1.7.0",
     "randomcolor": "^0.5.3",
+    "react-draggable": "^3.0.5",
+    "react-immutable-proptypes": "^2.1.0",
+    "scroll-into-view-if-needed": "^1.4.0",
+    "tabbable": "^1.1.2",
     "whatwg-fetch": "^2.0.3"
   },
   "devDependencies": {
@@ -162,7 +172,7 @@
     "jsuri": "^1.3.1",
     "leche": "^2.2.3",
     "lint-staged": "^6.1.0",
-    "lodash": "^4.17.4",
+    "lodash": "^4.17.5",
     "mocha": "^5.0.0",
     "node-sass": "^4.7.2",
     "optimize-css-assets-webpack-plugin": "^3.2.0",

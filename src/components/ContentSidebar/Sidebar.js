@@ -9,6 +9,7 @@ import { injectIntl } from 'react-intl';
 import TabView from 'box-react-ui/lib/components/tab-view/TabView';
 import Tab from 'box-react-ui/lib/components/tab-view/Tab';
 import DetailsSidebar from './DetailsSidebar';
+import ActivityFeedSidebar from './ActivityFeedSidebar';
 import hasSkillsData from './skillUtils';
 import messages from '../messages';
 import type { BoxItem } from '../../flowTypes';
@@ -67,6 +68,21 @@ const Sidebar = ({
         />
     );
 
+    const Activity = (
+        <ActivityFeedSidebar
+            file={file}
+            getPreviewer={getPreviewer}
+            hasTitle={hasTitle}
+            hasSkills={shouldShowSkills}
+            hasProperties={hasProperties}
+            hasMetadata={hasMetadata}
+            hasAccessStats={hasAccessStats}
+            hasClassification={hasClassification}
+            appElement={appElement}
+            rootElement={rootElement}
+        />
+    );
+
     if (!hasActivityFeed) {
         return Details;
     }
@@ -74,7 +90,7 @@ const Sidebar = ({
     return (
         <TabView defaultSelectedIndex={shouldShowSkills ? 0 : 1}>
             <Tab title={intl.formatMessage(messages.sidebarDetailsTitle)}>{Details}</Tab>
-            <Tab title='Activity' />
+            <Tab title='Activity'>{Activity}</Tab>
         </TabView>
     );
 };
