@@ -17,6 +17,7 @@ import './Sidebar.scss';
 
 type Props = {
     file: BoxItem,
+    api: API,
     getPreviewer: Function,
     hasTitle: boolean,
     hasSkills: boolean,
@@ -35,6 +36,7 @@ type Props = {
 
 const Sidebar = ({
     file,
+    api,
     getPreviewer,
     hasTitle,
     hasSkills,
@@ -71,6 +73,7 @@ const Sidebar = ({
     const Activity = (
         <ActivityFeedSidebar
             file={file}
+            api={api}
             getPreviewer={getPreviewer}
             hasTitle={hasTitle}
             hasSkills={shouldShowSkills}

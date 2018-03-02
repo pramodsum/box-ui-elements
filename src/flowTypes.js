@@ -181,6 +181,19 @@ export type BoxItem = {
     file_version?: BoxItemVersion
 };
 
+export type BoxCollab = {
+    id: number,
+    name: string,
+    email: string
+};
+
+export type BoxCollabCollection = {
+    item_id: string,
+    total_count?: number,
+    entries?: BoxCollab[],
+    nextMarker?: string
+};
+
 export type BoxItemCollection = {
     total_count?: number,
     entries?: BoxItem[],

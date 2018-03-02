@@ -275,7 +275,7 @@ class ContentSidebar extends PureComponent<Props, State> {
      * @param {Object} file - Box file
      * @return {void}
      */
-    fetchFileSuccessCallback = (file: BoxItem): void => {
+    fetchFileSuccessCallback = (file: BoxItemCollection): void => {
         this.setState({ file });
     };
 
@@ -288,8 +288,9 @@ class ContentSidebar extends PureComponent<Props, State> {
      * @return {void}
      */
     fetchFile(id: string, forceFetch: boolean = false): void {
+        const fileAPI = this.api.getFileAPI();
         if (this.shouldFetchOrRender()) {
-            this.api.getFileAPI().file(id, this.fetchFileSuccessCallback, this.errorCallback, forceFetch, true);
+            fileAPI.file(id, this.fetchFileSuccessCallback, this.errorCallback, forceFetch, true);
         }
     }
 
@@ -327,6 +328,7 @@ class ContentSidebar extends PureComponent<Props, State> {
                         {file ? (
                             <Sidebar
                                 file={file}
+                                api={this.api}
                                 getPreviewer={getPreviewer}
                                 hasTitle={hasTitle}
                                 hasSkills={hasSkills}

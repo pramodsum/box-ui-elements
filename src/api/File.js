@@ -64,6 +64,25 @@ class File extends Item {
             .catch(errorCallback);
     }
 
+    collaborations(
+        id: string,
+        searchString: string,
+        successCallback: Function,
+        errorCallback: Function
+    ): Promise<void> {
+        return this.xhr
+            .get({
+                // eslint-disable-next-line
+                url: this.getUrl(id) + '/collaborators',
+                id: this.getTypedFileId(id),
+                params: {
+                    filter_term: searchString
+                }
+            })
+            .then(successCallback)
+            .catch(errorCallback);
+    }
+
     /**
      * API for setting the description of a file
      *

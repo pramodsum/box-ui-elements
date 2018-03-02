@@ -13,20 +13,11 @@ import type { BoxItem } from '../../flowTypes';
 import './ActivityFeedSidebar.scss';
 
 const currentUser = { name: 'Sumedha Pramod', id: 18 };
-const contactData = [
-    { email: 'agraham@box.com', id: '1', name: 'Aubrey Graham' },
-    { email: 'atesfaye@box.com', id: '2', name: 'Abel Tesfaye' },
-    { email: 'klamar@box.com', id: '3', name: 'Kendrick Lamar' },
-    { email: 'bigsean@box.com', id: '4', name: 'Sean Anderson' },
-    { email: 'kwest@box.com', id: '5', name: 'Kanye West' },
-    { email: 'jayz@box.com', id: '6', name: 'Shawn Carter' },
-    { email: 'bknowles@box.com', id: '7', name: 'Beyonce Knowles' },
-    { email: 'jcole@box.com', id: '8', name: 'Jermaine Cole' }
-];
 
 /* eslint-disable jsx-a11y/label-has-for */
 class ActivityFeedSidebar extends Component<Props, State> {
     file: BoxItem;
+    api: API;
     getPreviewer: Function;
     hasTitle: boolean;
     rootElement: HTMLElement;
@@ -36,35 +27,77 @@ class ActivityFeedSidebar extends Component<Props, State> {
 
     constructor(props) {
         super(props);
+        this.api = this.props.api;
         this.state = {
             isInputOpen: false,
-            contacts: []
+            collaborators: []
         };
-    }
-
-    isMatchingContact(mentionString, contact) {
-        const { email, name } = contact;
-        return email.toLowerCase().indexOf(mentionString) > -1 || name.toLowerCase().indexOf(mentionString) > -1;
     }
 
     handleMention = (mentionString) => {
         if (!mentionString.length) {
             return;
         }
-        const matchingContacts = contactData.reduce(
-            (prev, contact) => (this.isMatchingContact(mentionString, contact) ? prev.concat([contact]) : prev),
-            []
-        );
 
-        this.setState({
-            contacts: matchingContacts
-        });
+        if (this.mentionDebounceHandler) {
+            clearTimeout(this.mentionDebounceHandler);
+            this.mentionDebounceHandler = null;
+        }
+
+        this.mentionDebounceHandler = setTimeout(() => {
+            const { file } = this.props;
+            this.fetchCollabMatches(file.id, mentionString);
+        }, 500);
     };
 
     onKeyDown = (event) => {
         const { nativeEvent } = event;
         nativeEvent.stopImmediatePropagation();
     };
+
+    parseContactsFromCollabs(collabResults: Array): void {
+        if (!collabResults) {
+            return;
+        }
+
+        const collaborators = [];
+        collabResults.forEach((collab) => {
+            const { id, name, login } = collab;
+            collaborators.push({ id, name, email: login });
+        });
+        this.setState({ collaborators });
+    }
+
+    /**
+     * Network error callback
+     *
+     * @private
+     * @param {Error} error error object
+     * @return {void}
+     */
+    errorCallback = (error: Error): void => {
+        /* eslint-disable no-console */
+        console.error(error);
+        /* eslint-enable no-console */
+    };
+
+    /**
+     * File fetch success callback
+     *
+     * @private
+     * @param {Object} file - Box file
+     * @return {void}
+     */
+    collabSuccessCallback = (collabs: BoxCollabCollection): void => {
+        const contacts = collabs.data.entries || [];
+        this.parseContactsFromCollabs(contacts);
+    };
+
+    fetchCollabMatches(id: string, searchString: string = ''): void {
+        console.log(searchString);
+        const fileAPI = this.api.getFileAPI();
+        fileAPI.collaborations(id, searchString, this.collabSuccessCallback, this.errorCallback);
+    }
 
     approvalCommentFormFocusHandler = () => this.setState({ isInputOpen: true });
     approvalCommentFormCancelHandler = () => this.setState({ isInputOpen: false });
@@ -75,12 +108,12 @@ class ActivityFeedSidebar extends Component<Props, State> {
     };
 
     render() {
-        const { contacts, isInputOpen } = this.state;
+        const { collaborators, isInputOpen } = this.state;
 
         return (
             <SidebarContent>
                 <ApprovalCommentForm
-                    mentionSelectorContacts={contacts.map((contact) => ({
+                    mentionSelectorContacts={collaborators.map((contact) => ({
                         id: contact.id,
                         name: contact.name,
                         item: contact
