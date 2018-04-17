@@ -13,9 +13,23 @@ import { hasSkills as hasSkillsData } from './Skills/skillUtils';
 import messages from '../messages';
 import type { AccessStats, BoxItem, FileVersions, Errors } from '../../flowTypes';
 import './Sidebar.scss';
+import ActivityFeed from './ActivityFeed/activity-feed/ActivityFeed';
+
+const feedState = [
+    {
+        createdAt: Date.now(),
+        id: '123123',
+        taggedMessage: 'I got 99 problems but @[123:Aubrey Graham] ain\'t one!',
+        createdBy: { name: 'Kanye West', id: 2 },
+        type: 'comment'
+    }
+];
+
+const currentUser = { name: 'Sumedha Pramod', id: 1 };
 
 type Props = {
     file: BoxItem,
+    api: API,
     getPreviewer: Function,
     hasTitle: boolean,
     hasSkills: boolean,
@@ -42,6 +56,7 @@ type Props = {
 
 const Sidebar = ({
     file,
+    api,
     getPreviewer,
     hasTitle,
     hasSkills,
@@ -65,6 +80,29 @@ const Sidebar = ({
     versionError
 }: Props) => {
     const shouldShowSkills = hasSkills && hasSkillsData(file);
+
+    const allHandlers = {
+        comments: {
+            create: ({ text }) => console.log(`comment create: ${text}`),
+            delete: ({ id }) => console.log(`delete comment: ${id}`)
+        },
+        tasks: {
+            create: () => console.log('task create'),
+            delete: ({ id }) => console.log(`delete task: ${id}`),
+            edit: ({ id, text }) => console.log(`edit task: ${id} with comment ${text}`),
+            onTaskAssignmentUpdate: (taskId, taskAssignmentId, status) =>
+                console.log(`task assignment update: ${status}`)
+        },
+        contacts: {
+            getApproverWithQuery: (mentionString) =>
+                getCollaborators(file.id, mentionString, fetchCollaboratorsSuccessCallback),
+            getMentionWithQuery: (mentionString) =>
+                getCollaborators(file.id, mentionString, fetchCollaboratorsSuccessCallback)
+        },
+        versions: {
+            info: (version) => console.log('version info for version: ', version)
+        }
+    };
 
     const Details = (
         <DetailsSidebar
@@ -91,14 +129,22 @@ const Sidebar = ({
         />
     );
 
-    if (!hasActivityFeed) {
-        return Details;
-    }
+    const ActivityFeedSidebar = hasActivityFeed ? (
+        <ActivityFeed
+            api={api}
+            feedState={feedState}
+            inputState={{
+                currentUser,
+                isDisabled: false
+            }}
+            handlers={allHandlers}
+        />
+    ) : null;
 
     return (
         <TabView defaultSelectedIndex={shouldShowSkills ? 0 : 1}>
             <Tab title={intl.formatMessage(messages.sidebarDetailsTitle)}>{Details}</Tab>
-            <Tab title='Activity' />
+            <Tab title='Activity'>{ActivityFeedSidebar}</Tab>
         </TabView>
     );
 };

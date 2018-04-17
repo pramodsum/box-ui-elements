@@ -55,6 +55,7 @@ type State = {
     file?: BoxItem,
     accessStats?: AccessStats,
     versions?: FileVersions,
+    collaborators?: BoxUserCollection,
     fileError?: Errors,
     versionError?: Errors
 };
@@ -397,7 +398,7 @@ class ContentSidebar extends PureComponent<Props, State> {
             onVersionHistoryClick,
             onAccessStatsClick
         }: Props = this.props;
-        const { file, accessStats, versions, fileError, versionError }: State = this.state;
+        const { file, accessStats, versions, collaborators, fileError, versionError }: State = this.state;
 
         const shouldRender = this.shouldFetchOrRender() && !!file;
 
@@ -408,7 +409,9 @@ class ContentSidebar extends PureComponent<Props, State> {
                         {shouldRender ? (
                             <Sidebar
                                 file={file}
+                                api={this.api}
                                 versions={versions}
+                                collaborators={collaborators}
                                 getPreviewer={getPreviewer}
                                 hasTitle={hasTitle}
                                 hasSkills={hasSkills}

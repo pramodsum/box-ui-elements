@@ -1,4 +1,4 @@
-@import '../../../styles/variables';
+@import '../../../variables';
 
 .bcs-activity-feed {
     display: flex;
@@ -85,6 +85,14 @@
 
         .selector-dropdown-wrapper {
             width: 100%;
+        }
+    }
+
+    .draft-js-editor label div {
+        padding: 0;
+
+        [contentEditable=true] {
+            padding: 10px;
         }
     }
 }

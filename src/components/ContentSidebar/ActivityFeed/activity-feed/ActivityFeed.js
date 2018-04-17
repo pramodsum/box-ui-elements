@@ -66,6 +66,7 @@ function shouldShowEmptyState(feedState: Array<Item>): boolean {
 }
 
 type Props = {
+    api: API,
     isLoading?: boolean,
     feedState: Array<Item>,
     inputState: {
@@ -117,6 +118,37 @@ class ActivityFeed extends Component<Props, State> {
         handlers.tasks.create(args);
         this.approvalCommentFormSubmitHandler();
     };
+
+    /**
+     * File collaborators fetch success callback
+     *
+     * @private
+     * @param {Object} file - Box file
+     * @return {void}
+     */
+    fetchCollaboratorsSuccessCallback(collabs: BoxCollabCollection): void => {
+        const contacts = collabs.data.entries || [];
+        const parsedCollabs = [];
+
+        contacts.forEach((collab) => {
+            const { id, name, login } = collab;
+            parsedCollabs.push({ id, name, email: login });
+        });
+        console.log(parsedCollabs);
+    };
+
+    /**
+     * Fetches the collaborators for a file
+     *
+     * @private
+     * @param {string} id - File id
+     * @param {string} searchString - Filter for users with a name or email that begins with this string
+     * @return {void}
+     */
+    fetchCollaborators(id: string, searchString: string = '', successCallback: Function = () => {}): void => {
+        const { api }: Props = this.props;
+        api.getFileAPI().getCollaborators(id, searchString, successCallback, this.errorCallback);
+    }
 
     render(): Node {
         const { feedState, handlers, inputState, isLoading, translations } = this.props;

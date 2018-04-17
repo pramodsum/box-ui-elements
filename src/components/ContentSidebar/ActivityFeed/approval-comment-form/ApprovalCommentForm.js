@@ -13,7 +13,7 @@ import Avatar from 'box-react-ui/lib/components/avatar/Avatar';
 import Form from 'box-react-ui/lib/components/form-elements/form/Form';
 import DraftJSMentionSelector, {
     DraftMentionDecorator
-} from 'box-react-ui/lib/components/form-elements/draft-js-mention-selector/DraftJSMentionSelector';
+} from 'box-react-ui/lib/components/form-elements/draft-js-mention-selector';
 import commonMessages from 'box-react-ui/lib/common/messages';
 
 import AddApproval from './AddApproval';
@@ -178,6 +178,20 @@ class ApprovalCommentForm extends Component<Props, State> {
         const approvers = this.state.approvers.slice();
         approvers.splice(index, 1);
         this.setState({ approvers });
+    };
+
+    handleMention = (mentionString) => {
+        if (!mentionString.length) {
+            return;
+        }
+
+        if (this.mentionDebounceHandler) {
+            clearTimeout(this.mentionDebounceHandler);
+            this.mentionDebounceHandler = null;
+        }
+
+        const { getMentionContactsWithQuery } = this.props;
+        this.mentionDebounceHandler = setTimeout(() => getMentionContactsWithQuery(mentionString), 500);
     };
 
     render(): Node {

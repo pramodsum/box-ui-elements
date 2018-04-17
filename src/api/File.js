@@ -48,6 +48,8 @@ class File extends Item {
      * API for getting download URL for files
      *
      * @param {string} id - File id
+     * @param {Function} successCallback - Success callback
+     * @param {Function} errorCallback - Error callback
      * @return {void}
      */
     getDownloadUrl(id: string, successCallback: Function, errorCallback: Function): Promise<void> {
@@ -61,6 +63,33 @@ class File extends Item {
             .then(({ data }: { data: BoxItem }) => {
                 successCallback(data[FIELD_DOWNLOAD_URL]);
             })
+            .catch(errorCallback);
+    }
+
+    /**
+     * API for getting download URL for files
+     *
+     * @param {string} id - File id
+     * @param {string} searchString - Filter for users with a name or email that begins with this string
+     * @param {Function} successCallback - Success callback
+     * @param {Function} errorCallback - Error callback
+     * @return {void}
+     */
+    getCollaborators(
+        id: string,
+        searchString: string,
+        successCallback: Function,
+        errorCallback: Function
+    ): Promise<void> {
+        return this.xhr
+            .get({
+                url: `${this.getUrl(id)}/collaborators`,
+                id: this.getTypedFileId(id),
+                params: {
+                    filter_term: searchString
+                }
+            })
+            .then(successCallback)
             .catch(errorCallback);
     }
 

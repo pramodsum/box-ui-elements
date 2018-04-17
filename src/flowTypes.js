@@ -217,6 +217,19 @@ export type BoxItem = {
     is_download_available: boolean
 };
 
+export type BoxUser = {
+    id: number,
+    name: string,
+    email: string
+};
+
+export type BoxUserCollection = {
+    item_id: string,
+    entries?: BoxUser[],
+    nextMarker?: string,
+    previousMarker?: string
+};
+
 export type BoxItemCollection = {
     total_count?: number,
     entries?: BoxItem[],
