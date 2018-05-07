@@ -59,7 +59,8 @@ type Props = {
     onTaskUpdate?: Function,
     onTaskAssignmentUpdate?: Function,
     getApproverWithQuery?: Function,
-    getMentionWithQuery?: Function
+    getMentionWithQuery?: Function,
+    getProfileUrl: Function
 };
 
 type State = {
@@ -466,7 +467,8 @@ class ContentSidebar extends PureComponent<Props, State> {
             onTaskUpdate,
             onTaskAssignmentUpdate,
             getApproverWithQuery,
-            getMentionWithQuery
+            getMentionWithQuery,
+            getProfileUrl
         }: Props = this.props;
         const { file, accessStats, versions, accessStatsError, fileError, versionError }: State = this.state;
 
@@ -510,6 +512,7 @@ class ContentSidebar extends PureComponent<Props, State> {
                                 onTaskAssignmentUpdate={onTaskAssignmentUpdate}
                                 getApproverWithQuery={getApproverWithQuery}
                                 getMentionWithQuery={getMentionWithQuery}
+                                {...getProfileUrl}
                             />
                         ) : (
                             <div className='bcs-loading'>

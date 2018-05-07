@@ -378,6 +378,9 @@
                 }
 
                 const handlers = {
+                    getProfileUrl: (userID) => {
+                        return `https://app.box.com/profile/${userID}`
+                    },
                     comments: {
                         create: ({ text }) => console.log(`comment create: ${text}`),
                         delete: ({ id }) => console.log(`delete comment: ${id}`),
@@ -426,7 +429,8 @@
                     onTaskUpdate: handlers.tasks.edit,
                     onTaskAssignmentUpdate: handlers.tasks.onTaskAssignmentUpdate,
                     getApproverWithQuery: handlers.contacts.getApproverWithQuery,
-                    getMentionWithQuery: handlers.contacts.getMentionWithQuery
+                    getMentionWithQuery: handlers.contacts.getMentionWithQuery,
+                    getProfileUrl: handlers.getProfileUrl
                 });
             }
             load();

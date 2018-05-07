@@ -30,6 +30,7 @@ type Props = {
     },
     inputState: InputState,
     items: Array<Item>,
+    generateProfileUrl: Function,
     onCommentDelete?: Function,
     onTaskAssignmentUpdate?: Function,
     onTaskDelete?: Function,
@@ -41,6 +42,7 @@ type Props = {
 const ActiveState = ({
     currentUser,
     items,
+    generateProfileUrl,
     onCommentDelete,
     onTaskDelete,
     onTaskEdit,
@@ -61,6 +63,7 @@ const ActiveState = ({
                             <Comment
                                 id={id}
                                 currentUser={currentUser}
+                                {...generateProfileUrl}
                                 onDelete={onCommentDelete}
                                 {...item}
                                 translations={translations}

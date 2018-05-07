@@ -27,6 +27,7 @@ import './ActivityFeed.scss';
 type Props = {
     isLoading?: boolean,
     feedState: Array<Item>,
+    getProfileUrl: Function,
     inputState: {
         currentUser: User,
         approverSelectorContacts?: SelectorItems,
@@ -161,7 +162,7 @@ class ActivityFeed extends React.Component<Props, State> {
     };
 
     render(): React.Node {
-        const { feedState, handlers, inputState, isLoading, permissions, translations } = this.props;
+        const { feedState, handlers, inputState, isLoading, permissions, translations, getProfileUrl } = this.props;
         const { approverSelectorContacts, mentionSelectorContacts, isInputOpen } = this.state;
         const { currentUser } = inputState;
         const showApprovalCommentForm = !!(currentUser && getProp(handlers, 'comments.create', false));
@@ -184,6 +185,7 @@ class ActivityFeed extends React.Component<Props, State> {
                             handlers={handlers}
                             items={collapseFeedState(feedState)}
                             currentUser={currentUser}
+                            {...getProfileUrl}
                             onTaskAssignmentUpdate={this.updateTaskAssignment}
                             onCommentDelete={hasCommentPermission ? this.deleteComment : noop}
                             onTaskDelete={hasTaskPermission ? this.deleteTask : noop}

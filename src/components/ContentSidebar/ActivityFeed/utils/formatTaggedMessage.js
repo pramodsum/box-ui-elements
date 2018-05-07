@@ -27,7 +27,8 @@ const splitRegex = /((?:[@＠﹫]\[[0-9]+:[^\]]+])|(?:\b(?:(?:ht|f)tps?:\/\/)[\w
 const formatTaggedMessage = (
     taggedMessage: string,
     itemID: string,
-    shouldReturnString: boolean
+    shouldReturnString: boolean,
+    generateProfileUrl: Function
 ): React.Node | string => {
     const contentItems = taggedMessage.split(splitRegex).map((text: string, contentIndex: number) => {
         const contentKey = `${contentIndex}-${itemID}`;
@@ -38,7 +39,7 @@ const formatTaggedMessage = (
             if (shouldReturnString) {
                 return `${trigger}${name}`;
             }
-            return <Mention id={Number(id)} key={contentKey}>{`${trigger}${name}`}</Mention>;
+            return <Mention id={Number(id)} key={contentKey} {...generateProfileUrl}>{`${trigger}${name}`}</Mention>;
         }
 
         if (!shouldReturnString) {
