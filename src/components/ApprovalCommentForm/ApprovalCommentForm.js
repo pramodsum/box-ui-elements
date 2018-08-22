@@ -17,7 +17,7 @@ import commonMessages from 'box-react-ui/lib/common/messages';
 
 import AddApproval from './AddApproval';
 import CommentInputControls from './CommentInputControls';
-import Avatar from '../ContentSidebar/ActivityFeed/Avatar';
+import Avatar from '../Avatar';
 import messages from '../messages';
 
 import './ApprovalCommentForm.scss';

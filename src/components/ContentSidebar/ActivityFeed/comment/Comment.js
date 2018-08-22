@@ -19,7 +19,7 @@ import CommentInlineError from './CommentInlineError';
 import CommentText from './CommentText';
 import ApprovalCommentForm from '../../../ApprovalCommentForm';
 import formatTaggedMessage from '../utils/formatTaggedMessage';
-import Avatar from '../Avatar';
+import Avatar from '../../../Avatar';
 import messages from '../../../messages';
 import { ACTIVITY_TARGETS } from '../../../../interactionTargets';
 

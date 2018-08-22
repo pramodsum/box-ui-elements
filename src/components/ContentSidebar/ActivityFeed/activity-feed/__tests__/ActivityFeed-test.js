@@ -3,7 +3,7 @@ import { shallow } from 'enzyme';
 
 import ActivityFeed from '../ActivityFeed';
 
-jest.mock('../../Avatar', () => 'Avatar');
+jest.mock('../../../Avatar', () => 'Avatar');
 jest.mock('../ActiveState', () => 'ActiveState');
 jest.mock('lodash/uniqueId', () => () => 'uniqueId');
 
@@ -14,7 +14,7 @@ const comments = {
             type: 'comment',
             id: '123',
             created_at: 'Thu Sep 26 33658 19:46:39 GMT-0600 (CST)',
-            tagged_message: 'test @[123:Jeezy] @[10:Kanye West]',
+            tagged_message: 'test @[123:Jeezy] @[10:Kanye West]',                                                                                                                                                                                                                                                                        
             created_by: { name: 'Akon', id: 11 }
         }
     ]
