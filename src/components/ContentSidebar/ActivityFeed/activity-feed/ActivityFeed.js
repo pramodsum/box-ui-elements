@@ -8,7 +8,7 @@ import getProp from 'lodash/get';
 import noop from 'lodash/noop';
 import classNames from 'classnames';
 import ActiveState from './ActiveState';
-import ApprovalCommentForm from '../approval-comment-form';
+import ApprovalCommentForm from '../../../ApprovalCommentForm';
 import EmptyState from './EmptyState';
 import { collapseFeedState, shouldShowEmptyState } from './activityFeedUtils';
 import './ActivityFeed.scss';

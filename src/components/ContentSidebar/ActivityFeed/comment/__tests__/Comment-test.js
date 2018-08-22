@@ -2,7 +2,7 @@ import * as React from 'react';
 import { mount, shallow } from 'enzyme';
 
 import Comment from '../Comment';
-import ApprovalCommentForm from '../../approval-comment-form/ApprovalCommentForm';
+import ApprovalCommentForm from '../../../../ApprovalCommentForm';
 import InlineEdit from '../InlineEdit';
 
 jest.mock('../../Avatar', () => () => 'Avatar');

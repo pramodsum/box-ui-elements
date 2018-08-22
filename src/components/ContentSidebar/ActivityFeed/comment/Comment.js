@@ -17,7 +17,7 @@ import InlineDelete from './InlineDelete';
 import InlineEdit from './InlineEdit';
 import CommentInlineError from './CommentInlineError';
 import CommentText from './CommentText';
-import ApprovalCommentForm from '../approval-comment-form';
+import ApprovalCommentForm from '../../../ApprovalCommentForm';
 import formatTaggedMessage from '../utils/formatTaggedMessage';
 import Avatar from '../Avatar';
 import messages from '../../../messages';

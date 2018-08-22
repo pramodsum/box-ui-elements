@@ -9,8 +9,8 @@ import { injectIntl } from 'react-intl';
 import Checkbox from 'box-react-ui/lib/components/checkbox/Checkbox';
 
 import AddApprovalFields from './AddApprovalFields';
-import { ACTIVITY_TARGETS } from '../../../../interactionTargets';
-import messages from '../../../messages';
+import { ACTIVITY_TARGETS } from '../../interactionTargets';
+import messages from '../messages';
 
 type Props = {
     approvalDate: ?Date,
