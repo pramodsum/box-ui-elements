@@ -15,6 +15,7 @@ import DraftJSMentionSelector, {
 import commonMessages from 'box-react-ui/lib/common/messages';
 
 import AddApproval from './AddApproval';
+import AddAnnotation from './AddAnnotation';
 import CommentInputControls from './CommentInputControls';
 import Avatar from '../Avatar';
 import messages from '../../../messages';
@@ -198,6 +199,8 @@ class ApprovalCommentForm extends React.Component<Props, State> {
             approverSelectorContacts,
             className,
             createTask,
+            onAnnotationModeToggle = noop,
+            createAnnotation = noop,
             getMentionWithQuery = noop,
             intl: { formatMessage },
             isDisabled,

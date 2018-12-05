@@ -1,0 +1,62 @@
+@import '../../../variables';
+
+.be {
+    .bcs-annotation {
+        .bcs-annotation-number {
+            background-color: $dehydrated;
+            border-radius: 50%;
+            box-shadow: 1px 1px 1px $seesee;
+            font-size: 8px;
+            height: 18px;
+            left: 18px;
+            position: relative;
+            text-align: center;
+            top: 38px;
+            width: 18px;
+            z-index: 2;
+        }
+
+        .bcs-annotation-comment-list-expand-button {
+            border: none;
+            color: $box-blue;
+            font-weight: bold;
+            left: 60px;
+            padding-top: 9px;
+            position: absolute;
+        }
+
+        .bcs-annotation-comment-item + .bcs-annotation-comment-item:before,
+        .bcs-annotation-comment-list-expand-button + .bcs-annotation-comment-item:before {
+            background-color: $seesee;
+            content: "";
+            display: block;
+            height: 23px;
+            left: 16px;
+            margin: 7px 0 2px 0;
+            position: relative;
+            width: 1px;
+        }
+
+        .bcs-highlight,
+        .bcs-drawing {
+            .bcs-comment-container {
+                display: flex;
+            }
+        }
+
+        .bcs-comment-avatar {
+            flex-shrink: 0;
+            margin-right: 10px;
+        }
+
+        .bcs-highlight-message,
+        .bcs-drawing-message {
+            align-self: center;
+            color: #444;
+            flex: 1;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    }
+}

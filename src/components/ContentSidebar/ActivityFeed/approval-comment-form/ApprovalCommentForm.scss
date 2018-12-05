@@ -133,5 +133,18 @@
                 width: 1px;
             }
         }
+
+        .bcs-annotation-input {
+            display: flex;
+            flex-flow: row wrap;
+
+            .bcs-comment-input {
+                flex-grow: 1;
+            }
+
+            .bcs-add-annotation-btn {
+                margin: 35px 5px;
+            }
+        }
     }
 }

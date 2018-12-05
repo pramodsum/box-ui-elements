@@ -6,6 +6,7 @@ import * as React from 'react';
 import getProp from 'lodash/get';
 import Comment from '../comment';
 import Task from '../task';
+import Annotation from '../annotation';
 import Version, { CollapsedVersion } from '../version';
 import Keywords from '../keywords';
 import withErrorHandling from '../../withErrorHandling';
@@ -38,12 +39,34 @@ const ActiveState = ({
     getUserProfileUrl,
     getMentionWithQuery,
     mentionSelectorContacts,
+    onAnnotationClick,
+    onAnnotationDelete,
 }: Props): React.Node => (
     <ul className="bcs-activity-feed-active-state">
         {items.map((item: any) => {
             const { type, id, versions, permissions } = item;
 
             switch (type) {
+                case 'annotation':
+                    return (
+                        <li
+                            id={`${type}_${id}`}
+                            className="bcs-activity-feed-annotation"
+                            key={type + id}
+                            onClick={() => onAnnotationClick(item)}
+                        >
+                            <Annotation
+                                {...item}
+                                currentUser={currentUser}
+                                onDelete={onAnnotationDelete}
+                                getAvatarUrl={getAvatarUrl}
+                                permissions={{
+                                    can_delete: getProp(permissions, 'can_delete', false),
+                                    can_edit: getProp(permissions, 'can_edit', false),
+                                }}
+                            />
+                        </li>
+                    );
                 case 'comment':
                     return (
                         <li className="bcs-activity-feed-comment" key={type + id}>

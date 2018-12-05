@@ -678,11 +678,38 @@ class ContentPreview extends PureComponent<Props, State> {
         this.preview.addListener('load', this.onPreviewLoad);
         this.preview.addListener('preview_error', this.onPreviewError);
         this.preview.addListener('preview_metric', this.onPreviewMetric);
+        this.preview.addListener('annotator', data => {
+            this.annotator = data;
+            this.setState({
+                onAnnotationClick: data.onAnnotationClick,
+            });
+        });
+        this.preview.addListener('annotationpending', data => {
+            this.setState({
+                annotationData: data,
+            });
+        });
         this.preview.updateFileCache([file]);
         this.preview.show(file.id, token, {
             ...previewOptions,
             ...omit(rest, Object.keys(previewOptions)),
         });
+    };
+
+    onAnnotationPost = annotation => {
+        this.annotator.createAnnotation(annotation);
+        this.setState({
+            annotationData: undefined,
+        });
+    };
+
+    onAnnotationDelete = annotation => {
+        const controller = this.annotator.modeControllers.point;
+        if (!controller) {
+            return;
+        }
+
+        controller.deleteAnnotationById(annotation.id);
     };
 
     /**
@@ -1065,7 +1092,14 @@ class ContentPreview extends PureComponent<Props, State> {
             responseInterceptor,
         }: Props = this.props;
 
-        const { file, isFileError, isReloadNotificationVisible, currentFileId }: State = this.state;
+        const {
+            file,
+            isFileError,
+            isReloadNotificationVisible,
+            currentFileId,
+            onAnnotationClick,
+            annotationData,
+        }: State = this.state;
         const { collection }: Props = this.props;
         const fileIndex = this.getFileIndex();
         const hasLeftNavigation = collection.length > 1 && fileIndex > 0 && fileIndex < collection.length;
@@ -1074,6 +1108,14 @@ class ContentPreview extends PureComponent<Props, State> {
         if (!currentFileId) {
             return null;
         }
+
+        const sidebarProps = {
+            ...contentSidebarProps,
+            onAnnotationPost: this.onAnnotationPost,
+            onAnnotationDelete: this.onAnnotationDelete,
+            annotationData,
+        };
+
         /* eslint-disable jsx-a11y/no-static-element-interactions */
         /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
         return (
@@ -1126,7 +1168,7 @@ class ContentPreview extends PureComponent<Props, State> {
                         </div>
                         {file && (
                             <ContentSidebar
-                                {...contentSidebarProps}
+                                {...sidebarProps}
                                 isLarge={isLarge}
                                 apiHost={apiHost}
                                 token={token}
@@ -1138,6 +1180,7 @@ class ContentPreview extends PureComponent<Props, State> {
                                 sharedLinkPassword={sharedLinkPassword}
                                 requestInterceptor={requestInterceptor}
                                 responseInterceptor={responseInterceptor}
+                                onAnnotationClick={onAnnotationClick}
                             />
                         )}
                     </div>

@@ -36,14 +36,20 @@
         }
 
         .bcs-activity-feed-task,
-        .bcs-activity-feed-comment {
+        .bcs-activity-feed-comment,
+        .bcs-activity-feed-annotation {
             border-bottom: 1px solid $ffive;
             margin-top: 20px;
             padding-bottom: 20px;
 
-            &:first-child .bcs-comment {
+            &:first-child .bcs-comment,
+            &:first-child .bcs-annotation {
                 margin-top: 0;
             }
+        }
+
+        .bcs-activity-feed-annotation {
+            margin: 0;
         }
 
         .bcs-activity-feed-task {

@@ -33,6 +33,9 @@ type Props = {
     getAvatarUrl: string => Promise<?string>,
     getUserProfileUrl?: string => Promise<string>,
     feedItems?: FeedItems,
+    onAnnotationClick: Function,
+    onAnnotationCreate: Function,
+    onAnnotationModeToggle: Function,
 };
 
 type State = {
@@ -51,8 +54,8 @@ class ActivityFeed extends React.Component<Props, State> {
     }
 
     componentDidUpdate(prevProps: Props, prevState: State) {
-        const { feedItems: prevFeedItems } = prevProps;
-        const { feedItems: currFeedItems } = this.props;
+        const { feedItems: prevFeedItems, annotationData: prevAnnotationData } = prevProps;
+        const { feedItems: currFeedItems, annotationData } = this.props;
         const { isInputOpen: prevIsInputOpen } = prevState;
         const { isInputOpen: currIsInputOpen } = this.state;
 
@@ -60,12 +63,16 @@ class ActivityFeed extends React.Component<Props, State> {
         const wasEmpty = this.isEmpty(prevProps);
         const hasLoaded = isEmpty !== wasEmpty && !isEmpty;
 
-        const hasMoreItems = prevFeedItems && currFeedItems && prevFeedItems.length < currFeedItems.length;
+        const hasMoreItems = true; // prevFeedItems && currFeedItems && prevFeedItems.length < currFeedItems.length;
         const hasNewItems = !prevFeedItems && currFeedItems;
         const hasInputOpened = currIsInputOpen !== prevIsInputOpen;
 
         if (hasLoaded || hasMoreItems || hasNewItems || hasInputOpened) {
             this.resetFeedScroll();
+        }
+
+        if (prevAnnotationData !== annotationData) {
+            this.setState({ annotationData });
         }
     }
 
@@ -123,6 +130,15 @@ class ActivityFeed extends React.Component<Props, State> {
         this.approvalCommentFormSubmitHandler();
     };
 
+    onAnnotationCreate = ({ text }: { text: string }) => {
+        const { onAnnotationCreate = noop, onAnnotationModeToggle = noop } = this.props;
+        const { annotationData } = this.state;
+
+        onAnnotationCreate({ ...annotationData, text });
+        this.approvalCommentFormSubmitHandler();
+        onAnnotationModeToggle();
+    };
+
     /**
      * Invokes version history popup handler.
      *
@@ -154,8 +170,10 @@ class ActivityFeed extends React.Component<Props, State> {
             onTaskUpdate,
             onTaskAssignmentUpdate,
             feedItems,
+            onAnnotationClick,
+            onAnnotationDelete,
         } = this.props;
-        const { isInputOpen } = this.state;
+        const { isInputOpen, annotationData } = this.state;
         const hasCommentPermission = getProp(file, 'permissions.can_comment', false);
         const showApprovalCommentForm = !!(currentUser && hasCommentPermission && onCommentCreate && feedItems);
 
@@ -190,6 +208,8 @@ class ActivityFeed extends React.Component<Props, State> {
                             getUserProfileUrl={getUserProfileUrl}
                             mentionSelectorContacts={mentionSelectorContacts}
                             getMentionWithQuery={getMentionWithQuery}
+                            onAnnotationClick={onAnnotationClick}
+                            onAnnotationDelete={onAnnotationDelete}
                         />
                     )}
                 </div>
@@ -202,7 +222,7 @@ class ActivityFeed extends React.Component<Props, State> {
                         className={classNames('bcs-activity-feed-comment-input', {
                             'bcs-is-disabled': isDisabled,
                         })}
-                        createComment={hasCommentPermission ? this.onCommentCreate : noop}
+                        createComment={annotationData ? this.onAnnotationCreate : this.onCommentCreate}
                         createTask={hasCommentPermission ? this.onTaskCreate : noop}
                         updateTask={hasCommentPermission ? onTaskUpdate : noop}
                         getApproverWithQuery={getApproverWithQuery}

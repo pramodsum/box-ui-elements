@@ -224,6 +224,37 @@ class ActivitySidebar extends React.PureComponent<Props, State> {
         this.fetchFeedItems();
     };
 
+    createAnnotation = (text: string, location: Object): void => {
+        const { file, api, onAnnotationCreate = noop, onAnnotationPost } = this.props;
+        const { currentUser } = this.state;
+
+        if (!currentUser) {
+            throw getBadUserError();
+        }
+
+        api.getFeedAPI(false).createAnnotation(
+            file,
+            currentUser,
+            text,
+            annotation => {
+                onAnnotationCreate(annotation);
+                onAnnotationPost(annotation);
+                this.feedSuccessCallback();
+            },
+            this.feedErrorCallback,
+        );
+
+        // need to load the pending item
+        this.fetchFeedItems();
+    };
+
+    deleteAnnotation = annotation => {
+        const { feedItems } = this.state;
+        const { onAnnotationDelete } = this.props;
+        onAnnotationDelete(annotation);
+        this.setState({ feedItems: feedItems.filter(item => item.id !== annotation.id) });
+    };
+
     /**
      * Creates a task via the API
      *
@@ -428,7 +459,15 @@ class ActivitySidebar extends React.PureComponent<Props, State> {
     };
 
     render() {
-        const { file, isDisabled = false, onVersionHistoryClick, getUserProfileUrl } = this.props;
+        const {
+            annotationData,
+            file,
+            isDisabled = false,
+            onVersionHistoryClick,
+            getUserProfileUrl,
+            onAnnotationClick,
+            onAnnotationDelete,
+        } = this.props;
         const {
             currentUser,
             approverSelectorContacts,
@@ -451,6 +490,7 @@ class ActivitySidebar extends React.PureComponent<Props, State> {
                     onTaskCreate={this.createTask}
                     onTaskDelete={this.deleteTask}
                     onTaskUpdate={this.updateTask}
+                    onAnnotationCreate={this.createAnnotation}
                     onTaskAssignmentUpdate={this.updateTaskAssignment}
                     getApproverWithQuery={this.getApproverWithQuery}
                     getMentionWithQuery={this.getMentionWithQuery}
@@ -459,6 +499,9 @@ class ActivitySidebar extends React.PureComponent<Props, State> {
                     getUserProfileUrl={getUserProfileUrl}
                     feedItems={feedItems}
                     currentUserError={currentUserError}
+                    onAnnotationClick={onAnnotationClick}
+                    onAnnotationDelete={this.deleteAnnotation}
+                    annotationData={annotationData}
                 />
             </SidebarContent>
         );

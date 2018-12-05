@@ -16,17 +16,18 @@ type Props = {
     onCancel: Function,
 };
 
-const CommentInputControls = ({ onCancel }: Props): React.Node => (
+const CommentInputControls = ({ onCancel, isEnabled }: Props): React.Node => (
     <div className="bcs-comment-input-controls">
         <Button
             className="bcs-comment-input-cancel-btn"
             data-resin-target={ACTIVITY_TARGETS.APPROVAL_FORM_CANCEL}
             onClick={onCancel}
+            disabled={isEnabled}
             type="button"
         >
             <FormattedMessage {...messages.commentCancel} />
         </Button>
-        <PrimaryButton className="bcs-comment-input-submit-btn" data-resin-target={ACTIVITY_TARGETS.APPROVAL_FORM_POST}>
+        <PrimaryButton disabled={isEnabled} className="bcs-comment-input-submit-btn" data-resin-target={ACTIVITY_TARGETS.APPROVAL_FORM_POST}>
             <FormattedMessage {...messages.commentPost} />
         </PrimaryButton>
     </div>

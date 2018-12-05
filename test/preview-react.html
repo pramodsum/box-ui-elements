@@ -25,16 +25,17 @@
             }
 
             .preview {
-                height: 600px;
+                height: 100%;
                 margin: 0 auto 50px;
-                width: 800px;
             }
         </style>
         <link rel="stylesheet" type="text/css" href="../dev/en-US/preview.css" />
         <script src="../dev/en-US/preview.js"></script>
+        <script src="https://app.spramod.inside-box.net/content-experience/dev/en-US/annotations.js"></script>
+        <link rel="stylesheet" type="text/css" href="https://app.spramod.inside-box.net/content-experience/dev/en-US/annotations.css"></script>
     </head>
     <body>
-        <div class="inputs">
+        <div class="inputs" style="display: none">
             <div>
                 <label>
                     <div>File Id</div>
@@ -72,12 +73,29 @@
                 localStorage.setItem('file', fileId);
                 document.querySelector('.file').value = fileId;
 
+                const ANNOTATOR_OPTIONS = {
+                    Image: {
+                        enabled: true,
+                    },
+                    Document: {
+                        enabled: true,
+                    },
+                    Presentation: {
+                        enabled: true,
+                    },
+                };
+
+                const boxAnnotations = new BoxAnnotations(ANNOTATOR_OPTIONS);
                 const preview1 = new ContentPreview();
                 preview1.show(fileId, token, {
                     hasHeader: true,
                     container: '.preview1',
+                    boxAnnotations,
                     collection: [FILE_ID_EXCEL, FILE_ID_VIDEO, FILE_ID_3D, FILE_ID_TEXT, FILE_ID_AUDIO],
-                    contentOpenWithProps: {}
+                    contentOpenWithProps: {},
+                    contentSidebarProps: {
+                        hasActivityFeed: true
+                    }
                 });
             }
             load();

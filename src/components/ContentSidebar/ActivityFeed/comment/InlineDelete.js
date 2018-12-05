@@ -32,8 +32,8 @@ class InlineDelete extends React.Component<Props, State> {
     };
 
     onDeleteConfirmedHandler = (): void => {
-        const { id, onDelete, permissions } = this.props;
-        onDelete({ id, permissions });
+        const { id, onDelete, permissions, annotationType } = this.props;
+        onDelete({ id, permissions, annotationType });
     };
 
     handleFlyoutOpen = (): void => {

@@ -111,6 +111,7 @@ class Comment extends React.Component<Props, State> {
             getUserProfileUrl,
             getMentionWithQuery,
             mentionSelectorContacts,
+            annotationType,
         } = this.props;
         const { toEdit } = this;
         const { isEditing, isFocused, isInputOpen } = this.state;
@@ -158,6 +159,7 @@ class Comment extends React.Component<Props, State> {
                                     permissions={permissions}
                                     message={<FormattedMessage {...inlineDeleteMessage} />}
                                     onDelete={onDelete}
+                                    annotationType={annotationType}
                                 />
                             ) : null}
                         </div>

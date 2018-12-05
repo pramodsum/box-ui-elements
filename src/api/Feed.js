@@ -9,6 +9,7 @@ import omit from 'lodash/omit';
 import Base from './Base';
 import CommentsAPI from './Comments';
 import VersionsAPI from './Versions';
+import AnnotationsAPI from './Annotations';
 import TasksAPI from './Tasks';
 import TaskAssignmentsAPI from './TaskAssignments';
 import { getBadItemError, getBadUserError, isUserCorrectableError } from '../util/error';
@@ -148,17 +149,39 @@ class Feed extends Base {
         Promise.all([versionsPromise, commentsPromise, tasksPromise]).then(feedItems => {
             const versions: ?FileVersions = feedItems[0];
             const versionsWithRestoredVersion = this.addCurrentVersion(versions, file);
-            const unsortedFeedItems = [versionsWithRestoredVersion, ...feedItems.slice(1)];
-            const sortedFeedItems = sortFeedItems(...unsortedFeedItems);
-            if (!this.isDestroyed()) {
-                this.setCachedItems(id, sortedFeedItems);
-                if (this.hasError) {
-                    errorCallback(sortedFeedItems);
-                } else {
-                    successCallback(sortedFeedItems);
+
+            this.fetchAnnotations(versionsWithRestoredVersion.entries).then(annotations => {
+                const unsortedFeedItems = [versionsWithRestoredVersion, ...annotations, ...feedItems.slice(1)];
+                const sortedFeedItems = sortFeedItems(...unsortedFeedItems);
+                if (!this.isDestroyed()) {
+                    this.setCachedItems(id, sortedFeedItems);
+                    if (this.hasError) {
+                        errorCallback(sortedFeedItems);
+                    } else {
+                        successCallback(sortedFeedItems);
+                    }
                 }
-            }
+            });
         });
+    }
+
+    fetchAnnotations(versions) {
+        const annotationsPromises = [];
+        versions.forEach(({ id }) => {
+            annotationsPromises.push(this.fetchVersionAnnotations(id));
+        });
+
+        return Promise.all(annotationsPromises);
+    }
+
+    fetchVersionAnnotations(fileVersionId): Promise<?Annotations> {
+        this.annotationsAPI = new AnnotationsAPI(this.options);
+        return this.annotationsAPI.fetchVersionAnnotations(
+            this.id,
+            fileVersionId,
+            response => response,
+            this.fetchFeedItemErrorCallback.bind(this, response => response),
+        );
     }
 
     /**
@@ -820,7 +843,7 @@ class Feed extends Base {
         const cachedItems = this.getCachedItems(this.id);
         if (cachedItems) {
             const updatedFeedItems = cachedItems.items.map((item: Comment | Task | BoxItemVersion) => {
-                if (item.id === id) {
+                if (item.id === id || item.threadID === updates.threadID) {
                     return {
                         ...item,
                         ...updates,
@@ -890,6 +913,180 @@ class Feed extends Base {
                 this.createCommentErrorCallback(e, code, uuid);
             },
         });
+    };
+
+    /**
+     * Create a comment, and make a pending item to be replaced once the API is successful.
+     *
+     * @param {BoxItem} file - The file to which the task is assigned
+     * @param {Object} currentUser - the user who performed the action
+     * @param {string} text - the comment text
+     * @param {boolean} hasMention - true if there is an @mention in the text
+     * @param {Function} successCallback - the success callback
+     * @param {Function} errorCallback - the error callback
+     * @return {void}
+     */
+    createAnnotation = (
+        file: BoxItem,
+        currentUser: User,
+        annotationData: Object,
+        successCallback: Function,
+        errorCallback: ErrorCallback,
+    ): void => {
+        const uuid = uniqueId('annotation_');
+        const { type, text: message, location, threadID, createdAt, threadNumber: thread } = annotationData;
+
+        const annotation = {
+            item: {
+                id: file.file_version.id,
+                type: 'file_version',
+            },
+            details: {
+                type,
+                location,
+                threadID,
+            },
+            message,
+            createdBy: currentUser,
+            createdAt,
+            thread,
+        };
+
+        const { id, permissions, createdBy: created_by, createdAt: created_at, ...rest } = annotationData;
+        const cachedItems = this.getCachedItems(file.id);
+        const matchingAnnotations = cachedItems.items.filter(annotation => annotation.threadID === threadID);
+        const parentAnnotation = matchingAnnotations.length > 0 ? matchingAnnotations[0] : null;
+
+        this.id = file.id;
+        this.errorCallback = errorCallback;
+
+        if (!file.id) {
+            throw getBadItemError();
+        }
+
+        const comment = {
+            id,
+            created_at,
+            created_by: currentUser,
+            message,
+        };
+
+        if (parentAnnotation) {
+            parentAnnotation.comments = this.appendComments(comment, parentAnnotation.comments);
+            this.updateFeedItem(
+                {
+                    ...parentAnnotation,
+                    isPending: false,
+                },
+                id,
+            );
+        } else {
+            const annotationItem: Annotation = {
+                id,
+                type: 'annotation',
+                annotationType: type,
+                location,
+                threadID,
+                threadNumber: thread,
+                created_by: this.formatUserInfo(created_by),
+                comments: this.appendComments(comment, []),
+            };
+            this.addPendingItem(this.id, currentUser, annotationItem);
+        }
+
+        this.annotationsAPI = new AnnotationsAPI(this.options);
+
+        this.annotationsAPI.createAnnotation({
+            id: this.id,
+            version: file.file_version.id,
+            annotation,
+            successCallback: annotation => {
+                this.createAnnotationSuccessCallback(annotation.data, uuid, successCallback);
+            },
+            errorCallback: (e: ErrorResponseData, code: string) => {
+                this.createCommentErrorCallback(e, code, uuid);
+            },
+        });
+    };
+
+    formatUserInfo(user): User {
+        const { profile_image, login, ...rest } = user;
+        return {
+            ...rest,
+            email: login,
+            avatar_url: profile_image,
+        };
+    }
+
+    formatComment(entry: AnnotationData): CommentProps {
+        const { id, message, permissions, created_by, created_at, modified_at } = entry;
+        return {
+            id,
+            message,
+            permissions,
+            created_by: this.formatUserInfo(created_by),
+            created_at,
+            modified_at,
+            isPending: false,
+        };
+    }
+
+    appendComments(entry: AnnotationData, comments: Comments = []): Comments {
+        const { message } = entry;
+        if (message && message.trim() !== '') {
+            comments.push(this.formatComment(entry));
+        }
+
+        return comments;
+    }
+
+    createAnnotationSuccessCallback = (annotation: Object, id: string, successCallback: Function): void => {
+        const { id: annotationId, details, permissions, thread: threadNumber, ...rest } = annotation;
+
+        const cachedItems = this.getCachedItems(this.id);
+        const matchingAnnotations = cachedItems.items.filter(item => item.threadID === annotation.details.threadID);
+        const parentAnnotation = matchingAnnotations.length > 0 ? matchingAnnotations[0] : null;
+
+        const annotationItem: Annotation = {
+            id: annotationId,
+            ...details,
+            type: 'annotation',
+            annotationType: details.type,
+            threadNumber,
+            ...rest,
+            comments: parentAnnotation.comments,
+        };
+
+        annotationItem.comments = annotationItem.comments.map(comment => {
+            if (comment.id) {
+                return comment;
+            }
+            const { created_at, created_by, modified_at } = annotation;
+            return {
+                ...comment,
+                created_by: this.formatUserInfo(created_by),
+                created_at,
+                modified_at,
+                id: annotationId,
+            };
+        });
+
+        this.updateFeedItem(
+            {
+                ...annotationItem,
+                isPending: false,
+            },
+            annotationId,
+        );
+
+        // if (cachedItems) {
+        //     const updatedFeedItems = cachedItems.items.push(annotationItem);
+        //     this.setCachedItems(id, updatedFeedItems);
+        // }
+
+        if (!this.isDestroyed()) {
+            successCallback(annotationItem);
+        }
     };
 
     /**

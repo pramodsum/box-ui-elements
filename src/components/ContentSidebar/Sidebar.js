@@ -55,6 +55,10 @@ const Sidebar = ({
     metadataSidebarProps,
     onToggle,
     onVersionHistoryClick,
+    onAnnotationClick,
+    annotationData,
+    onAnnotationPost,
+    onAnnotationDelete,
 }: Props) => (
     <React.Fragment>
         <SidebarNav
@@ -82,6 +86,10 @@ const Sidebar = ({
                 currentUser={currentUser}
                 file={file}
                 onVersionHistoryClick={onVersionHistoryClick}
+                onAnnotationClick={onAnnotationClick}
+                annotationData={annotationData}
+                onAnnotationPost={onAnnotationPost}
+                onAnnotationDelete={onAnnotationDelete}
                 {...activitySidebarProps}
             />
         )}

@@ -668,6 +668,11 @@ const messages: { [string]: MessageDescriptor } = defineMessages({
             'Assigning a task to someone will send them a notification with the message in the comment box and allow them to approve or deny.',
         description: 'Tooltip text for checkbox to add approvers to a comment',
     },
+    approvalAddAnnotation: {
+        id: 'be.approvalAddAnnotation',
+        defaultMessage: 'Add Annotation',
+        description: 'Label for checkbox to add approvers to a comment',
+    },
     approvalAssignees: {
         id: 'be.approvalAssignees',
         defaultMessage: 'Assignees',
@@ -865,6 +870,18 @@ const messages: { [string]: MessageDescriptor } = defineMessages({
     versionUploaded: {
         id: 'be.versionUploaded',
         defaultMessage: '{ name } uploaded version { version_number }',
+        description:
+            'Message displayed in the activity feed for a newly uploaded version. {name} is the user who performed the action. { version_number } is the file version string.',
+    },
+    highlighted: {
+        id: 'be.highlighted',
+        defaultMessage: '{ name } highlighted on V{ version_number } page { page }',
+        description:
+            'Message displayed in the activity feed for a newly uploaded version. {name} is the user who performed the action. { version_number } is the file version string.',
+    },
+    drew: {
+        id: 'be.drew',
+        defaultMessage: '{ name } drew on V{ version_number } page { page }',
         description:
             'Message displayed in the activity feed for a newly uploaded version. {name} is the user who performed the action. { version_number } is the file version string.',
     },
