@@ -1,6 +1,6 @@
 {
     "name": "box-ui-elements",
-    "version": "0.0.0-semantically-released",
+    "version": "8.9.1",
     "description": "Box UI Elements",
     "author": "Box (https://www.box.com/)",
     "license": "SEE LICENSE IN LICENSE",
@@ -77,13 +77,25 @@
             "last 2 iOS versions",
             "IE 11"
         ],
-        "dev": ["last 1 Chrome versions", "last 1 Firefox versions"]
+        "dev": [
+            "last 1 Chrome versions",
+            "last 1 Firefox versions"
+        ]
     },
     "lint-staged": {
         "linters": {
-            "*.js": ["eslint --report-unused-disable-directives --fix", "git add"],
-            "*.md": ["prettier --write --parser=markdown", "git add"],
-            "*.json": ["prettier --write --parser=json", "git add"]
+            "*.js": [
+                "eslint --report-unused-disable-directives --fix",
+                "git add"
+            ],
+            "*.md": [
+                "prettier --write --parser=markdown",
+                "git add"
+            ],
+            "*.json": [
+                "prettier --write --parser=json",
+                "git add"
+            ]
         }
     },
     "husky": {
@@ -106,13 +118,24 @@
             "\\.(css|less)$": "<rootDir>/conf/styleMock.js",
             "react-virtualized/dist/es": "react-virtualized/dist/commonjs"
         },
-        "transformIgnorePatterns": ["node_modules/(?!(box-react-ui|react-virtualized))", "react-virtualized"],
+        "transformIgnorePatterns": [
+            "node_modules/(?!(box-react-ui|react-virtualized))",
+            "react-virtualized"
+        ],
         "collectCoverage": false,
         "coverageDirectory": "<rootDir>/reports",
-        "collectCoverageFrom": ["src/**/*.js", "!**/node_modules/**", "!**/__tests__/**"],
-        "roots": ["src"],
+        "collectCoverageFrom": [
+            "src/**/*.js",
+            "!**/node_modules/**",
+            "!**/__tests__/**"
+        ],
+        "roots": [
+            "src"
+        ],
         "setupTestFrameworkScriptFile": "<rootDir>/conf/enzyme-adapter.js",
-        "snapshotSerializers": ["enzyme-to-json/serializer"]
+        "snapshotSerializers": [
+            "enzyme-to-json/serializer"
+        ]
     },
     "devEngines": {
         "node": ">=8.x",
