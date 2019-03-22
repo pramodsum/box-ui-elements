@@ -84,7 +84,12 @@ class Annotation extends React.PureComponent<Props> {
     }
 
     render() {
-        return <div className="bcs-annotation">{this.getAnnotationItem()}</div>;
+        const { onClick } = this.props;
+        return (
+            <button className="bcs-annotation" onClick={onClick} type="button">
+                {this.getAnnotationItem()}
+            </button>
+        );
     }
 }
 

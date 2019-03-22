@@ -49,17 +49,16 @@ const ActiveState = ({
             switch (type) {
                 case 'annotation':
                     return (
-                        <li
-                            id={`${type}_${id}`}
-                            className="bcs-activity-feed-annotation"
-                            key={type + id}
-                            onClick={() => onAnnotationClick(item)}
-                        >
+                        <li id={`${type}_${id}`} className="bcs-activity-feed-annotation" key={type + id}>
                             <Annotation
                                 {...item}
                                 currentUser={currentUser}
                                 onDelete={onAnnotationDelete}
                                 getAvatarUrl={getAvatarUrl}
+                                onClick={() => {
+                                    console.log();
+                                    onAnnotationClick(item);
+                                }}
                                 permissions={{
                                     can_delete: getProp(permissions, 'can_delete', false),
                                     can_edit: getProp(permissions, 'can_edit', false),

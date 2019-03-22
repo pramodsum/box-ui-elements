@@ -2,7 +2,7 @@
 import axios from 'axios';
 import Base from './Base';
 
-// import { PLACEHOLDER_USER, ANNOTATOR_EVENT, ERROR_TYPE } from '../constants';
+import { PLACEHOLDER_USER } from '../constants';
 
 const FIELDS = 'item,thread,details,message,created_by,created_at,modified_at,permissions';
 
@@ -89,7 +89,7 @@ class API extends Base {
      * @param {AnnotationData[]} annotations - Annotations to generate map from
      * @return {AnnotationMap} Map of thread ID to annotations in that thread
      */
-    createAnnotationMap(entries) {
+    createAnnotationMap = (entries): AnnotationMap => {
         const annotations = {};
 
         // Construct map of thread ID to annotations
@@ -123,21 +123,21 @@ class API extends Base {
                 ...rest,
                 canAnnotate: true,
                 canDelete: permissions.can_delete,
-                comments: this.appendComments(entry, annotations[threadID].comments),
+                comments: this.appendComments(entry, annotations[threadID].comments)
             };
 
             // NOTE: Highlight comment annotations can be structured as a plain highlight
             // followed by a collection of comments. This will correctly set the annotation
             // type for such annotations as 'highlight-comment'
             if (annotation.type === 'highlight' && annotation.comments.length > 0) {
-                annotation.type = 'highlight_comment';
+                annotation.type = 'highlight-comment';
             }
 
             annotations[threadID] = annotation;
         });
 
         return Object.entries(annotations);
-    }
+    };
 
     formatUserInfo(user): User {
         const { profile_image, login, ...rest } = user;
